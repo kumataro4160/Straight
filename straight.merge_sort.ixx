@@ -1,6 +1,6 @@
-﻿export module straight.sort:merge_sort;
+﻿export module straight:merge_sort;
 
-namespace straight
+namespace kuma
 {
 	constexpr size_t floorPowOf2(size_t n)noexcept
 	{
@@ -14,7 +14,7 @@ namespace straight
 	}
 }
 
-namespace straight
+namespace kuma
 {
 	template <class T>
 	inline void _sort_2_ToOut(const T* in, T* out)noexcept
@@ -132,7 +132,7 @@ namespace straight
 	}
 }
 
-export namespace straight
+export namespace kuma
 {
 	template <class T>
 	void mergeSort(T* arr, size_t n)noexcept
