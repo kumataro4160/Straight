@@ -1,6 +1,7 @@
 ﻿module;
 
 #include <vector>
+#include <bit>
 
 export module straight;
 
@@ -30,17 +31,6 @@ export namespace kuma
 
 namespace kuma
 {
-	constexpr size_t _floorPowOf2(size_t n)noexcept
-	{
-		n = (n & 0xffffffff00000000ULL) ? (n & 0xffffffff00000000ULL) : n;
-		n = (n & 0xffff0000ffff0000ULL) ? (n & 0xffff0000ffff0000ULL) : n;
-		n = (n & 0xff00ff00ff00ff00ULL) ? (n & 0xff00ff00ff00ff00ULL) : n;
-		n = (n & 0xf0f0f0f0f0f0f0f0ULL) ? (n & 0xf0f0f0f0f0f0f0f0ULL) : n;
-		n = (n & 0xccccccccccccccccULL) ? (n & 0xccccccccccccccccULL) : n;
-		n = (n & 0xaaaaaaaaaaaaaaaaULL) ? (n & 0xaaaaaaaaaaaaaaaaULL) : n;
-		return n;
-	}
-
 	template <class T>
 	inline void _sort_2_ToOut(const T* in, T* out)noexcept
 	{
@@ -144,7 +134,7 @@ namespace kuma
 		{
 			return;
 		}
-		const size_t nL = _floorPowOf2(n);
+		const size_t nL = std::bit_floor(n);
 		const size_t nR = n & ~nL;// n - nL
 		if(nR == 0)
 		{
@@ -169,7 +159,7 @@ namespace kuma
 			_sort_2_ToIn(arr);
 			return;
 		}
-		const size_t nL = _floorPowOf2(n - 1);
+		const size_t nL = std::bit_floor(n - 1);
 		const size_t nR = n - nL;
 		{
 			T* const aux = new T[nL];
