@@ -1,38 +1,17 @@
-﻿module;
+﻿#ifndef KUMATARO_INCLUDE_STRAIGHT_H
+#define KUMATARO_INCLUDE_STRAIGHT_H
 
+#include <array>
 #include <vector>
 #include <bit>
 
-export module straight;
 
-export namespace kuma
+namespace kuma::impl
 {
-	template <class T>
-	void sort(T* const arr, const size_t n)noexcept;
-
-	template <class T, size_t N>
-	inline void sort(std::array<T, N>& arr)noexcept
-	{
-		sort(&arr[0], N);
-	}
+	//POT = Power Of Two
 
 	template <class T>
-	inline void sort(std::vector<T>& arr)noexcept
-	{
-		sort(&arr[0], arr.size());
-	}
-
-	template <std::contiguous_iterator Iterator>
-	inline void sort(Iterator begin, Iterator end)noexcept
-	{
-		sort(&(*begin), std::distance(begin, end));
-	}
-}
-
-namespace kuma
-{
-	template <class T>
-	inline void _sort_2_ToOut(const T* in, T* out)noexcept
+	constexpr void sort_2_ToOut(const T* in, T* out)noexcept
 	{
 		if(in[0] <= in[1])
 		{
@@ -47,7 +26,7 @@ namespace kuma
 	}
 
 	template <class T>
-	inline void _sort_2_ToIn(T* inout)noexcept
+	constexpr void sort_2_ToIn(T* inout)noexcept
 	{
 		if(inout[0] > inout[1])
 		{
@@ -58,7 +37,7 @@ namespace kuma
 	}
 
 	template <class T>
-	inline void _merge_POT_ToOut(const T* in, T* out, size_t nHalf)noexcept
+	constexpr void merge_POT_ToOut(const T* in, T* out, size_t nHalf)noexcept
 	{
 		const T* const sortedL = in;
 		const T* const sortedR = in + nHalf;
@@ -71,38 +50,38 @@ namespace kuma
 	}
 
 	template <class T>
-	void _mergeSort_POT_ToIn(T* inout, T* aux, size_t n)noexcept;
+	void mergeSort_POT_ToIn(T* inout, T* aux, size_t n)noexcept;
 
 	template <class T>
-	void _mergeSort_POT_ToOut(T* in, T* out, size_t n)noexcept
+	void mergeSort_POT_ToOut(T* in, T* out, size_t n)noexcept
 	{
 		if(n == 2)
 		{
-			_sort_2_ToOut(in, out);
+			sort_2_ToOut(in, out);
 			return;
 		}
 		const size_t nHalf = n / 2;
-		_mergeSort_POT_ToIn(in, out, nHalf);
-		_mergeSort_POT_ToIn(in + nHalf, out, nHalf);
-		_merge_POT_ToOut(in, out, nHalf);
+		mergeSort_POT_ToIn(in, out, nHalf);
+		mergeSort_POT_ToIn(in + nHalf, out, nHalf);
+		merge_POT_ToOut(in, out, nHalf);
 	}
 
 	template <class T>
-	void _mergeSort_POT_ToIn(T* inout, T* aux, size_t n)noexcept
+	void mergeSort_POT_ToIn(T* inout, T* aux, size_t n)noexcept
 	{
 		if(n == 2)
 		{
-			_sort_2_ToIn(inout);
+			sort_2_ToIn(inout);
 			return;
 		}
 		const size_t nHalf = n / 2;
-		_mergeSort_POT_ToOut(inout, aux, nHalf);
-		_mergeSort_POT_ToOut(inout + nHalf, aux + nHalf, nHalf);
-		_merge_POT_ToOut(aux, inout, nHalf);
+		mergeSort_POT_ToOut(inout, aux, nHalf);
+		mergeSort_POT_ToOut(inout + nHalf, aux + nHalf, nHalf);
+		merge_POT_ToOut(aux, inout, nHalf);
 	}
 
 	template <class T>
-	inline void _merge_N_ToInR(const T* auxL, T* inout, size_t nL, size_t nR)noexcept
+	constexpr void merge_N_ToInR(const T* auxL, T* inout, size_t nL, size_t nR)noexcept
 	{
 		const T* const inoutR = inout + nL;
 		if(auxL[nL - 1] <= inoutR[nR - 1])
@@ -128,7 +107,7 @@ namespace kuma
 	}
 
 	template <class T>
-	void _mergeSort_N_ToIn(T* inout, T* aux, size_t n)noexcept
+	void mergeSort_N_ToIn(T* inout, T* aux, size_t n)noexcept
 	{
 		if(n == 1)
 		{
@@ -138,16 +117,16 @@ namespace kuma
 		const size_t nR = n & ~nL;// n - nL
 		if(nR == 0)
 		{
-			_mergeSort_POT_ToIn(inout, aux, nL);
+			mergeSort_POT_ToIn(inout, aux, nL);
 			return;
 		}
-		_mergeSort_POT_ToOut(inout, aux, nL);
-		_mergeSort_N_ToIn(inout + nL, aux + nL, nR);
-		_merge_N_ToInR(aux, inout, nL, nR);
+		mergeSort_POT_ToOut(inout, aux, nL);
+		mergeSort_N_ToIn(inout + nL, aux + nL, nR);
+		merge_N_ToInR(aux, inout, nL, nR);
 	}
 
 	template <class T>
-	void mergeSort(T* arr, size_t n)noexcept
+	constexpr void mergeSort(T* arr, size_t n)noexcept
 	{
 		switch(n)
 		{
@@ -156,16 +135,16 @@ namespace kuma
 			return;
 
 		case 2:
-			_sort_2_ToIn(arr);
+			sort_2_ToIn(arr);
 			return;
 		}
 		const size_t nL = std::bit_floor(n - 1);
 		const size_t nR = n - nL;
 		{
 			T* const aux = new T[nL];
-			_mergeSort_N_ToIn(arr + nL, aux, nR);
-			_mergeSort_POT_ToOut(arr, aux, nL);
-			_merge_N_ToInR(aux, arr, nL, nR);
+			mergeSort_N_ToIn(arr + nL, aux, nR);
+			mergeSort_POT_ToOut(arr, aux, nL);
+			merge_N_ToInR(aux, arr, nL, nR);
 			delete[]aux;
 		}
 	}
@@ -173,9 +152,32 @@ namespace kuma
 
 namespace kuma
 {
+	using namespace impl;
+
 	template <class T>
 	void sort(T* const arr, const size_t n)noexcept
 	{
 		mergeSort(arr, n);
 	}
+
+	template <std::contiguous_iterator Iterator>
+	inline void sort(Iterator begin, Iterator end)noexcept
+	{
+		sort(&(*begin), std::distance(begin, end));
+	}
+
+	template <class T, size_t N>
+	inline void sort(std::array<T, N>& arr)noexcept
+	{
+		sort(arr.begin(), arr.end());
+	}
+
+	template <class T>
+	inline void sort(std::vector<T>& arr)noexcept
+	{
+		sort(arr.begin(), arr.end());
+	}
 }
+
+
+#endif
